@@ -1,0 +1,35 @@
+<RCC>
+    <qresource prefix="/components/qml">
+        <file alias="Calendar.qml">qml/Calendar.qml</file>
+        <file alias="CalendarHeaderModel.qml">qml/CalendarHeaderModel.qml</file>
+        <file alias="CalendarModel.qml">qml/CalendarModel.qml</file>
+        <file alias="CalendarStyle.qml">qml/CalendarStyle.qml</file>
+        <file alias="DateUtils.js">qml/DateUtils.js</file>
+        <file alias="TOPButton.qml">qml/TOPButton.qml</file>
+        <file alias="TOPDatepicker.qml">qml/TOPDatepicker.qml</file>
+        <file alias="TOPListModel.qml">qml/TOPListModel.qml</file>
+        <file alias="TOPMediaControl.qml">qml/TOPMediaControl.qml</file>
+        <file alias="TOPMediaGrid.qml">qml/TOPMediaGrid.qml</file>
+        <file alias="TOPMediaSelector.qml">qml/TOPMediaSelector.qml</file>
+        <file alias="TOPMediaSlides.qml">qml/TOPMediaSlides.qml</file>
+        <file alias="TOPPluginsGrid.qml">qml/TOPPluginsGrid.qml</file>
+        <file alias="TOPPreviewAudio.qml">qml/TOPPreviewAudio.qml</file>
+        <file alias="TOPPreviewImage.qml">qml/TOPPreviewImage.qml</file>
+        <file alias="TOPPreviewUnknown.qml">qml/TOPPreviewUnknown.qml</file>
+        <file alias="TOPPreviewVideo.qml">qml/TOPPreviewVideo.qml</file>
+        <file alias="TOPSlider.qml">qml/TOPSlider.qml</file>
+        <file alias="TOPSwitch.qml">qml/TOPSwitch.qml</file>
+        <file alias="TOPThumbnailAudio.qml">qml/TOPThumbnailAudio.qml</file>
+        <file alias="TOPThumbnailImage.qml">qml/TOPThumbnailImage.qml</file>
+        <file alias="TOPThumbnailUnknown.qml">qml/TOPThumbnailUnknown.qml</file>
+        <file alias="TOPThumbnailVideo.qml">qml/TOPThumbnailVideo.qml</file>
+        <file alias="TOPScrollBar.qml">qml/TOPScrollBar.qml</file>
+    </qresource>
+    <qresource prefix="/components/images">
+        <file alias="transparency">resources/transparencybackground.png</file>
+        <file alias="photo">resources/photo.png</file>
+        <file alias="sound">resources/sound.png</file>
+        <file alias="unknown">resources/unknown.png</file>
+        <file alias="video">resources/video.png</file>
+    </qresource>
+</RCC>
