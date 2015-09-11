@@ -103,11 +103,6 @@ Rectangle {
                     sliderReleased()
                 }
 
-                onClicked: {
-                    value = (mouse.x + grip.width/2) / slider.width
-                    sliderReleased()
-                }
-
                 function updatePosition() {
                     value = (grip.x + grip.width/2) / slider.width
                 }
