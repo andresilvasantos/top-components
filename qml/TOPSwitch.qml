@@ -17,6 +17,8 @@ Item {
     property int knobBorderWidth: 0
 
     signal toggled()
+    signal entered()
+    signal exited()
 
     function toggle() {
         if (toggleSwitch.state == "on")
@@ -72,6 +74,15 @@ Item {
             drag.target: knob; drag.axis: Drag.XAxis; drag.minimumX: background.x; drag.maximumX: background.x + background.width - knob.width
             onClicked: toggle()
             onReleased: releaseSwitch()
+            hoverEnabled: true
+
+            onEntered: {
+                toggleSwitch.entered()
+            }
+
+            onExited: {
+                toggleSwitch.exited()
+            }
         }
     }
 
