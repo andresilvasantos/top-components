@@ -9,8 +9,25 @@ Item {
     height: 20
 
     property date selectedDate : new Date()
+    property string dateStr: ""
 
     signal dateChanged (string date)
+
+    onDateStrChanged: {
+        if(dateStr.length) {
+            var dates = dateStr.split("/")
+            var day = parseInt(dates[0])
+            var month = parseInt(dates[1])
+            var year = parseInt(dates[2])
+
+            var newDate = new Date()
+            newDate.setDate(day)
+            newDate.setMonth(month)
+            newDate.setFullYear(year)
+
+            updateDate(newDate)
+        }
+    }
 
     function updateDate(date) {
         selectedDate = date;
@@ -42,7 +59,8 @@ Item {
             selectedDate = newDate;
             calendar.selectedDate = selectedDate;
             dateField.text = calendar.selectedDateText;
-            dateChanged(calendar.selectedDate.getDate() + "/" + calendar.selectedDate.getMonth() + "/" + calendar.selectedDate.getFullYear());
+            //dateChanged(calendar.selectedDate.getDate() + "/" + calendar.selectedDate.getMonth() + "/" + calendar.selectedDate.getFullYear());
+            dateStr = calendar.selectedDate.getDate() + "/" + calendar.selectedDate.getMonth() + "/" + calendar.selectedDate.getFullYear()
         }
         else
             calendar.selectedDate.setDate(selectedDate.getDate());
@@ -53,7 +71,7 @@ Item {
 
     Rectangle {
         id: dateFieldHolder
-        color: "#cccccc"
+        color: "#00ffffff"
         width: parent.width
         height: parent.height
 
@@ -61,23 +79,32 @@ Item {
             id: dateField
             color: "#7e8387"
             anchors.centerIn: parent
+
+            Behavior on color {
+                ColorAnimation {duration: 200; easing.type: Easing.OutSine}
+            }
         }
 
         MouseArea {
             hoverEnabled: true
 
             onEntered: {
-                dateFieldHolder.color = "#b9e1fc"
+                dateFieldHolder.color = "#00addc"
+                dateField.color = "white"
             }
 
             onExited: {
-                dateFieldHolder.color = "#cccccc"
+                dateFieldHolder.color = "#00ffffff"
+                dateField.color = "#7e8387"
             }
 
             anchors.fill: parent
             onClicked: toggleModal()
         }
 
+        Behavior on color {
+            ColorAnimation {duration: 200; easing.type: Easing.OutSine}
+        }
     }
 
     Window {

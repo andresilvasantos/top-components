@@ -1,12 +1,21 @@
-import QtQuick 2.2
+import QtQuick 2.5
 
-Rectangle {
-    color: "#222222"
+Item {
+    id: mainRect
 
     property bool loaded: false
     property string mediaSource
     property string mediaAlias
-    signal touched()
+
+    signal clicked()
+    signal doubleClicked()
+
+    Rectangle {
+        anchors.fill: parent
+        border.width: 1
+        border.color: "#cccccc"
+        color: "#aaaaaa"
+    }
 
     Image {
         id: icon
@@ -22,7 +31,11 @@ Rectangle {
         anchors.fill: parent
 
         onClicked: {
-            touched()
+            mainRect.clicked()
+        }
+
+        onDoubleClicked: {
+            mainRect.doubleClicked()
         }
     }
 

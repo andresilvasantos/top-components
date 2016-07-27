@@ -1,4 +1,4 @@
-import QtQuick 2.2
+import QtQuick 2.5
 
 Item {
     id: toggleSwitch
@@ -23,7 +23,7 @@ Item {
     function toggle() {
         if (toggleSwitch.state == "on")
             toggleSwitch.state = "off";
-        else 
+        else
             toggleSwitch.state = "on";
 
         toggled()

@@ -1,7 +1,8 @@
-import QtQuick 2.2
+import QtQuick 2.5
 
 ListModel {
-    property string sortColumnName
+    property bool numbers: false
+    property string sortColumnName: ""
     property string order: "asc" //asc or desc
 
     function swap(a,b) {
@@ -17,27 +18,51 @@ ListModel {
 
     function partition(begin, end, pivot)
     {
-        var piv=get(pivot)[sortColumnName].toLowerCase();
-        swap(pivot, end-1);
-        var store=begin;
-        var ix;
-        for(ix=begin; ix<end-1; ++ix) {
-            if (order === "asc") {
-                if(get(ix)[sortColumnName].toLowerCase() < piv) {
-                    swap(store,ix);
-                    ++store;
+        if(numbers) {
+            var piv=get(pivot)[sortColumnName]
+            swap(pivot, end-1);
+            var store=begin;
+            var ix;
+            for(ix=begin; ix<end-1; ++ix) {
+                if (order === "asc") {
+                    if(get(ix)[sortColumnName] < piv) {
+                        swap(store,ix);
+                        ++store;
+                    }
+                }
+                else if (order === "desc") {
+                    if(get(ix)[sortColumnName] > piv) {
+                        swap(store,ix);
+                        ++store;
+                    }
                 }
             }
-            else if (order === "desc") {
-                if(get(ix)[sortColumnName].toLowerCase() > piv) {
-                    swap(store,ix);
-                    ++store;
-                }
-            }
-        }
-        swap(end-1, store);
+            swap(end-1, store);
 
-        return store;
+            return store;
+        }
+        else {
+            piv=get(pivot)[sortColumnName].toLowerCase();
+            swap(pivot, end-1);
+            store=begin;
+            for(ix=begin; ix<end-1; ++ix) {
+                if (order === "asc") {
+                    if(get(ix)[sortColumnName].toLowerCase() < piv) {
+                        swap(store,ix);
+                        ++store;
+                    }
+                }
+                else if (order === "desc") {
+                    if(get(ix)[sortColumnName].toLowerCase() > piv) {
+                        swap(store,ix);
+                        ++store;
+                    }
+                }
+            }
+            swap(end-1, store);
+
+            return store;
+        }
     }
 
     function qsort(begin, end)
@@ -53,6 +78,10 @@ ListModel {
     }
 
     function quick_sort() {
-        if(sortColumnName.length > 0) qsort(0,count)
+        if(sortColumnName.length) qsort(0,count)
+    }
+
+    function quick_sort_starting_at(begin) {
+        qsort(begin,count)
     }
 }

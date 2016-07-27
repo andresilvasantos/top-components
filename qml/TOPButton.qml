@@ -1,9 +1,15 @@
-import QtQuick 2.2
+import QtQuick 2.5
 
 Item {
     id: container
 
     signal clicked
+    signal doubleClicked
+    signal hovered
+    signal hoveredOut
+    signal pressed()
+    signal released()
+
     property string text
     property string color
     property string hoverColor: color
@@ -14,7 +20,7 @@ Item {
     property string textFamily: "Arrial Narrow"
     property bool checkable: false
     property bool checked: false
-    property int radius
+    property int radius: 0
     property int borderWidth: 0
     property string borderColor: color
 
@@ -32,12 +38,24 @@ Item {
             anchors.fill: parent
             hoverEnabled: true
 
-            onExited: {
-                if(!checkable || !checked) buttonRectangle.state = "default"
-            }
-
             onEntered: {
                 if(!checked) buttonRectangle.state = "hovered"
+                hovered()
+            }
+
+            onExited: {
+                if(!checkable || !checked) buttonRectangle.state = "default"
+                hoveredOut()
+            }
+
+            onPressed: {
+                buttonRectangle.state = "pressed"
+                container.pressed()
+            }
+
+            onReleased: {
+                buttonRectangle.state = "default"
+                container.released()
             }
 
             onClicked: {
@@ -45,6 +63,10 @@ Item {
                 container.clicked()
 
                 if(!checkable) stateTimer.start()
+            }
+
+            onDoubleClicked: {
+                container.doubleClicked()
             }
         }
 

@@ -65,7 +65,7 @@ Style {
     property Calendar control: __control
 
     property Component background: Rectangle {
-        color: __syspal.base
+        color: "white"
     }
 
     property Component navigationBar: Item {
@@ -74,53 +74,85 @@ Style {
 
         Rectangle {
             anchors.fill: parent
-            color: __syspal.highlight
+            color: "#00addc"
         }
 
         KeyNavigation.tab: previousMonth
 
-        Button {
+        Rectangle {
             id: previousMonth
-            anchors.left: parent.left
-            anchors.verticalCenter: parent.verticalCenter
-            anchors.leftMargin: (parent.height - height) / 2
-            iconName: "go-previous-view"
-            text: "<"
-            width: 20
+            width: 30
+            height: 20
+            color: "white"
 
-            onClicked: control.previousMonth()
+            anchors {
+                left: parent.left
+                verticalCenter: parent.verticalCenter
+                leftMargin: (parent.height - height) / 2
+            }
+
+            Text {
+                text: "Back"
+                color: "#333333"
+
+                anchors.centerIn: parent
+            }
+
+            MouseArea {
+                anchors.fill: parent
+
+                onClicked: {
+                    control.previousMonth()
+                }
+            }
         }
+
         Text {
             id: dateText
             text: control.selectedDateText
+            color: "white"
             anchors.centerIn: parent
         }
-        Button {
-            id: nextMonth
-            anchors.right: parent.right
-            anchors.verticalCenter: parent.verticalCenter
-            anchors.rightMargin: (parent.height - height) / 2
-            iconName: "go-next-view"
-            text: ">"
-            width: 20
 
-            onClicked: control.nextMonth()
+
+        Rectangle {
+            id: nextMonth
+            width: 30
+            height: 20
+            color: "white"
+
+            anchors {
+                right: parent.right
+                verticalCenter: parent.verticalCenter
+                rightMargin: (parent.height - height) / 2
+            }
+
+            Text {
+                text: "Next"
+                color: "#333333"
+
+                anchors.centerIn: parent
+            }
+
+            MouseArea {
+                anchors.fill: parent
+
+                onClicked: {
+                    control.nextMonth()
+                }
+            }
         }
     }
 
     property Component dateDelegate: Rectangle {
         id: dayDelegate
-        color: cellDate !== undefined && isCurrentItem ? __syspal.highlight : __syspal.base
+        color: cellDate !== undefined && isCurrentItem ? "#00addc" : "white"
 
         Text {
-            SystemPalette {
-                id: pal
-                colorGroup: cellDate.getMonth() === control.selectedDate.getMonth() ? SystemPalette.Active : SystemPalette.Disabled
-            }
             id: dayDelegateText
             text: cellDate.getDate()
             anchors.centerIn: parent
-            color: isCurrentItem ? pal.highlightedText : pal.text
+            color: isCurrentItem ? "white" : (cellDate.getMonth() === control.selectedDate.getMonth() ? "#333" : "#999")
         }
     }
 
@@ -133,11 +165,12 @@ Style {
                 width: calendarStyle.cellWidth
                 height: calendarStyle.cellHeight
                 Rectangle {
-                    color: __syspal.base
+                    color: "white"
                     anchors.fill: parent
                     Text {
                         text: DateUtils.dayNameFromDayOfWeek(control.locale,
                             control.dayOfWeekFormat, dayOfWeek)
+                        color: "#212121"
                         anchors.centerIn: parent
                     }
                 }
@@ -147,8 +180,8 @@ Style {
 
     property Component panel: Item {
         anchors.fill: parent
-        implicitWidth: 250
-        implicitHeight: 250
+        implicitWidth: 300
+        implicitHeight: 300
 
         property alias navigationBarItem: navigationBarLoader.item
 

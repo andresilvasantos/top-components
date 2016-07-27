@@ -1,6 +1,6 @@
 TEMPLATE = lib
 CONFIG += plugin staticlib
-QT += qml
+QT += qml quick
 
 ROOT_DIR = ../..
 
@@ -17,4 +17,10 @@ RESOURCES += \
     componentsresources.qrc
 
 HEADERS += \
-    componentslibrary.h
+    componentslibrary.h \
+    documenthandler.h \
+    toptimer.h
+
+SOURCES += \
+    documenthandler.cpp \
+    toptimer.cpp

@@ -1,11 +1,10 @@
-import QtQuick 2.2
+import QtQuick 2.5
 import QtQuick.Controls 1.1
 import QtQuick.Layouts 1.1
 import "qrc:/components/qml/"
 
-RowLayout {
+Item {
     focus: true
-    spacing: 12
 
     property bool playing: false
     property int currentSeekSec: 0
@@ -16,7 +15,7 @@ RowLayout {
     signal stop()
     signal seek(real seekTo)
 
-    onDurationSecChanged: {
+    /*onDurationSecChanged: {
         if(durationSec < 0) durationSeekText.text = numberToTimeFormat(0)
         else durationSeekText.text = numberToTimeFormat(durationSec)
     }
@@ -47,16 +46,21 @@ RowLayout {
         }
 
         return minStr + ":" + secStr
-    }
+    }*/
 
     TOPButton {
         id: buttonPlay
-        width: 80
+        width: 60
         height: parent.height
         color: "#212121"
-        hoverColor: "#002E4C"
-        selectedColor: "#0099FF"
-        radius: 5
+        hoverColor: "#8000addc"
+        selectedColor: "#00addc"
+        radius: 2
+
+        anchors {
+            left: parent.horizontalCenter
+            leftMargin: 10
+        }
 
         Text {
             text: playing ? "PAUSE" : "PLAY"
@@ -73,12 +77,17 @@ RowLayout {
 
     TOPButton {
         id: buttonStop
-        width: 80
+        width: 60
         height: parent.height
         color: "#212121"
-        hoverColor: "#002E4C"
-        selectedColor: "#0099FF"
-        radius: 5
+        hoverColor: "#8000addc"
+        selectedColor: "#00addc"
+        radius: 2
+
+        anchors {
+            right: parent.horizontalCenter
+            rightMargin: 10
+        }
 
         Text {
             text: "STOP"
@@ -91,7 +100,7 @@ RowLayout {
             stop()
         }
     }
-
+/*
     Row {
         Text {
             id: positionSeekText
@@ -140,5 +149,5 @@ RowLayout {
                 seek(value)
             }
         }
-    }
+    }*/
 }

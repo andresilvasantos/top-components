@@ -184,7 +184,7 @@ Control {
         This property holds the CalendarModel that will be used by the Calendar
         to populate the dates available to the user.
     */
-    property CalendarModel model: CalendarModel { locale: calendar.locale }
+    property TOPCalendarModel model: TOPCalendarModel { locale: calendar.locale }
 
     /*!
         \qmlsignal Calendar::doubleClicked(date selectedDate)
@@ -374,5 +374,13 @@ Control {
 
             sourceComponent: __style.headerDelegate
         }
+    }
+
+    Rectangle {
+        color: "transparent"
+        border.width: 1
+        border.color: "#ccc"
+
+        anchors.fill: view
     }
 }

@@ -1,4 +1,4 @@
-import QtQuick 2.2
+import QtQuick 2.5
 import QmlVlc 0.1
 
 Rectangle {
@@ -8,17 +8,16 @@ Rectangle {
 
     property string mediaDir
     property string mediaSource
-    property int detailsHeight
 
-    property bool inRange: mediaSlides.currentIndex === index
+    property bool inRange: false
 
     onInRangeChanged: {
-        if(!inRange && mediaPlayer.playbackState == MediaPlayer.PlayingState) mediaPlayer.pause()
+        if(!inRange) mediaPlayer.pause()
+        else mediaPlayer.mrl = mediaDir + "/" + mediaSource
     }
 
     VlcPlayer {
         id: mediaPlayer
-        mrl: mediaDir + "/" + mediaSource
         volume: 100
 
         onStateChanged: {
@@ -28,8 +27,7 @@ Rectangle {
 
     VlcVideoSurface {
         id: video
-        width: parent.width
-        height: parent.height - detailsHeight
+        anchors.fill: parent
         fillMode: Qt.KeepAspectRatio
         source: mediaPlayer
 
@@ -45,14 +43,11 @@ Rectangle {
                 bottomMargin: 20
             }
 
-
             playing: mediaPlayer.state == VlcPlayer.Playing
             currentSeekSec: Math.ceil(mediaPlayer.position * durationSec)
             durationSec: Math.ceil(videoDuration / 1000)
 
-            onPlay: {
-                if(inRange) mediaPlayer.play()
-            }
+            onPlay: mediaPlayer.play()
 
             onPause: mediaPlayer.pause()
 
@@ -62,139 +57,6 @@ Rectangle {
                 if(mediaPlayer.state !== VlcPlayer.Stopped) {
                     mediaPlayer.position = seekTo
                 }
-            }
-        }
-    }
-
-    Flow {
-        id: mediaDetailsRect
-        width: parent.width
-        height: detailsHeight - anchors.topMargin
-        spacing: 10
-
-        anchors {
-            top: video.bottom
-            topMargin: 5
-        }
-
-
-        Row {
-            width: childrenRect.width
-            height: 30
-            spacing: 10
-
-            Text {
-                text: "Name"
-                color: "white"
-                font.pixelSize: 15
-                opacity: .6
-            }
-
-            Rectangle {
-                width: 200
-                height: parent.height * .8
-                color: "white"
-                radius: 5
-
-                TextInput {
-                    id: mediaName
-                    text: mediaAlias
-                    color: "#111111"
-                    font.pixelSize: 14
-                    selectByMouse: true
-                    selectionColor: "#333333"
-//                    focus: true
-                    horizontalAlignment: TextInput.AlignLeft
-                    verticalAlignment: TextInput.AlignVCenter
-
-                    clip: true
-
-                    anchors.fill: parent
-
-                    anchors {
-                        left: parent.left
-                        leftMargin: 5
-                        right: parent.right
-                        rightMargin: 5
-                        verticalCenter: parent.verticalCenter
-                    }
-                }
-            }
-        }
-
-        Row {
-            width: childrenRect.width
-            height: 30
-            spacing: 5
-
-            Text {
-                text: "Resolution:"
-                color: "white"
-                font.pixelSize: 15
-                opacity: .6
-            }
-
-            Text {
-                text: videoResolution
-                color: "white"
-                font.pixelSize: 15
-            }
-        }
-
-        Row {
-            width: childrenRect.width
-            height: 30
-            spacing: 5
-
-            Text {
-                text: "Codec:"
-                color: "white"
-                font.pixelSize: 15
-                opacity: .6
-            }
-
-            Text {
-                text: videoCodec
-                color: "white"
-                font.pixelSize: 15
-            }
-        }
-
-        Row {
-            width: childrenRect.width
-            height: 30
-            spacing: 5
-
-            Text {
-                text: "Frame rate:"
-                color: "white"
-                font.pixelSize: 15
-                opacity: .6
-            }
-
-            Text {
-                text: videoFrameRate
-                color: "white"
-                font.pixelSize: 15
-            }
-        }
-
-        Row {
-            width: childrenRect.width
-            height: 30
-            spacing: 5
-
-            Text {
-                text: "Size:"
-                color: "white"
-                font.pixelSize: 15
-                opacity: .6
-            }
-
-            Text {
-                text: mediaSize + "MB"
-                color: "white"
-                font.pixelSize: 15
             }
         }
     }

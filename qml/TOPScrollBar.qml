@@ -1,18 +1,21 @@
-import QtQuick 2.0;
+import QtQuick 2.5
 
 Item {
     id: scrollbar;
-    width: (handleSize/* + 2 * (backScrollbar.border.width +1)*/);
+    width: enlargeEnabled && (groove.hovered || clicker.drag.active || clicker.pressed) ? handleExpandedSize : handleSize
     visible: (flickable.visibleArea.heightRatio < 1.0);
-    anchors {
-        top: flickable.top;
-        right: flickable.right;
-        bottom: flickable.bottom;
-        margins: 1;
+    opacity: 0
+
+    Behavior on width {
+        NumberAnimation {duration: 150}
     }
 
-    property Flickable flickable               : null;
-    property int       handleSize              : 10;
+    property Flickable flickable: null;
+    property int handleSize: 10;
+    property int handleExpandedSize: 15;
+    property bool visibleBackground: true
+    property bool enlargeEnabled: true
+    property string scrollBarImage: "qrc:/components/images/scrollbar"
 
     function scrollDown () {
         flickable.contentY = Math.min (flickable.contentY + (flickable.height / 4), flickable.contentHeight - flickable.height);
@@ -24,20 +27,22 @@ Item {
     Binding {
         target: handle;
         property: "y";
-        value: ((flickable.contentY - flickable.originY) * (clicker.drag.maximumY) / (flickable.contentHeight - flickable.height));
+        value: ((flickable.contentY - flickable.originY) * clicker.drag.maximumY / (flickable.contentHeight - flickable.height));
         when: (!clicker.drag.active);
     }
 
     Binding {
         target: flickable;
         property: "contentY";
-        value: (handle.y * (flickable.contentHeight - flickable.height) / (clicker.drag.maximumY)) + flickable.originY;
+        value: flickable.originY + (handle.y * (flickable.contentHeight - flickable.height) / clicker.drag.maximumY)
         when: (clicker.drag.active || clicker.pressed);
     }
 
-    Item {
+    Rectangle {
         id: groove;
         clip: true;
+        color: visibleBackground ? "black" : "transparent"
+        opacity: .1
         anchors {
             fill: parent;
         }
@@ -53,7 +58,7 @@ Item {
             drag {
                 target: handle;
                 minimumY: 0;
-                maximumY: (flickable.height - handle.height);
+                maximumY: (scrollbar.height - handle.height);
                 axis: Drag.YAxis;
             }
 
@@ -65,28 +70,39 @@ Item {
                 groove.hovered = false
             }
 
-            onClicked: {
+            onPressed: {
                 flickable.contentY = (mouse.y / groove.height * (flickable.contentHeight - flickable.height))
             }
         }
+    }
 
-        Item {
-            id: handle;
-            height: Math.max (20, (flickable.visibleArea.heightRatio * groove.height));
-            anchors {
-                left: parent.left;
-                right: parent.right;
-            }
+    Item {
+        id: handle;
+        height: Math.max (20, (flickable.visibleArea.heightRatio * groove.height));
+        anchors {
+            left: groove.left;
+            right: groove.right;
+        }
 
-            Rectangle {
-                id: backHandle;
-                color: "black"
-                opacity: flickable.moving || clicker.pressed || groove.hovered ? 0.65 : 0
-                anchors.fill: parent
-                radius: handleSize
 
-                Behavior on opacity { NumberAnimation {duration: 150} }
+        BorderImage {
+            source: scrollBarImage
+            border { left: 1; right: 1; top: 1; bottom: 1 }
+            anchors{
+                fill: parent
+                margins: 1
             }
         }
+    }
+
+    states: State {
+        name: "visible"
+        when: flickable.moving || clicker.pressed || groove.hovered
+        PropertyChanges { target: scrollbar; opacity: 1.0 }
+    }
+
+    transitions: Transition {
+        from: "visible"; to: ""
+        NumberAnimation {properties: "opacity"; duration: 600}
     }
 }

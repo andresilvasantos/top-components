@@ -1,12 +1,22 @@
-import QtQuick 2.2
+import QtQuick 2.5
 
 Item {
+    id: mainRect
 
     property bool aspectFill: true
     property bool loaded: false
     property string mediaSource
     property string mediaAlias
-    signal touched()
+    signal clicked()
+    signal doubleClicked()
+
+    Rectangle {
+        anchors.fill: parent
+        border.width: 1
+        border.color: "#cccccc"
+        color: "#aaaaaa"
+        visible: image.status != Image.Ready
+    }
 
     Image {
         id: imageTransparent
@@ -18,6 +28,7 @@ Item {
         cache: true
         horizontalAlignment: Image.AlignLeft
         verticalAlignment: Image.AlignTop
+        visible: image.status == Image.Ready
 
         anchors.fill: parent
     }
@@ -37,12 +48,31 @@ Item {
             if(image.progress == 1) loaded = true
         }
 
-        MouseArea {
-            anchors.fill: parent
-
-            onClicked: {
-                touched()
+        Timer {
+            interval: 2000
+            repeat: true
+            running: image.status == Image.Error
+            onTriggered: {
+                image.source = ""
+                image.source = mediaSource
             }
+        }
+    }
+
+    TOPLoadingBubbles {
+        anchors.fill: parent
+        visible: image.status != Image.Ready
+    }
+
+    MouseArea {
+        anchors.fill: parent
+
+        onClicked: {
+            mainRect.clicked()
+        }
+
+        onDoubleClicked: {
+            mainRect.doubleClicked()
         }
     }
 }

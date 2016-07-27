@@ -1,15 +1,21 @@
-import QtQuick 2.2
-import TOP.Interactive 1.0
+import QtQuick 2.5
 
 Rectangle {
-    id: mediaSlidesHolder
-    color: "transparent"
+    id: mainRect
+    color: "#212121"
 
     property variant slidesModel
     property string searchFilter
     property string typeFilter
     property int detailsHeight: 100
-    property var selectedMedia: []
+    property int currentIndex: 0
+
+    signal mediaAliasUpdated(string mediaPath, string mediaAlias)
+
+    onCurrentIndexChanged: {
+        mediaSlides.currentIndex = mainRect.currentIndex
+        miniView.currentIndex = mainRect.currentIndex
+    }
 
     ListView {
         id: miniView
@@ -25,11 +31,12 @@ Rectangle {
 
         anchors {
             horizontalCenter: parent.horizontalCenter
+            top: parent.top
+            topMargin: 10
         }
 
         onCurrentIndexChanged: {
-            //            mediaSlides.highlightMoveDuration = 400
-            mediaSlides.currentIndex = currentIndex
+            mainRect.currentIndex = currentIndex
         }
 
         delegate: Rectangle {
@@ -87,11 +94,11 @@ Rectangle {
     Rectangle {
         id: miniViewHighlight
         width: height
-        height: miniView.height + 5
+        height: miniView.height
         color: "transparent"
-        border.width: 3
+        border.width: 2
         border.color: "#0099FF"
-        radius: 5
+        radius: 2
 
         anchors.centerIn: miniView
     }
@@ -135,10 +142,20 @@ Rectangle {
             height: mediaSlides.height
             color: "transparent"
 
+            property bool inRange: mediaSlides.currentIndex == index
+
+            onInRangeChanged: {
+                if(slideLoader.item && mediaType == "video") slideLoader.item.inRange = inRange
+            }
+
             Loader {
                 id: slideLoader
                 width: parent.width
-                height: parent.height
+
+                anchors {
+                    top: parent.top
+                    bottom: mediaDetailsRect.top
+                }
 
                 source: {
                     if(!uploadCompleted) return "TOPPreviewUnknown.qml"
@@ -160,24 +177,237 @@ Rectangle {
                 onLoaded: {
                     item.mediaDir = mediaModel.path
                     item.mediaSource = mediaPath
-                    item.detailsHeight = detailsHeight
+                    //item.detailsHeight = detailsHeight
+                    if(mediaType == "video" || mediaType == "audio") slideLoader.item.inRange = inRange
+                }
+            }
+
+
+            Item {
+                id: mediaDetailsRect
+                width: parent.width
+                height: detailsHeight// - anchors.topMargin
+
+                anchors {
+                    bottom: parent.bottom
+                }
+
+                Flow {
+                    spacing: 10
+
+                    anchors {
+                        fill: parent
+                        margins: 10
+                    }
+
+                    Row {
+                        id: mediaAliasRow
+                        width: childrenRect.width
+                        height: 30
+                        spacing: 10
+
+                        Text {
+                            text: "Name"
+                            color: "white"
+                            font.pixelSize: 15
+                            opacity: .6
+                        }
+
+                        Rectangle {
+                            width: 200
+                            height: parent.height * .8
+                            color: "white"
+                            radius: 2
+
+                            TextInput {
+                                id: mediaName
+                                text: mediaAlias
+                                color: "#212121"
+                                font.pixelSize: 14
+                                selectByMouse: true
+                                selectionColor: "#333333"
+            //                    focus: true
+                                horizontalAlignment: TextInput.AlignLeft
+                                verticalAlignment: TextInput.AlignVCenter
+
+                                clip: true
+
+                                anchors.fill: parent
+
+                                anchors {
+                                    left: parent.left
+                                    leftMargin: 5
+                                    right: parent.right
+                                    rightMargin: 5
+                                    verticalCenter: parent.verticalCenter
+                                }
+
+                                onEditingFinished: {
+                                    mediaAliasUpdated(mediaPath, mediaName.text)
+                                }
+                            }
+                        }
+                    }
+
+                    Row {
+                        id: imageResolutionRow
+                        width: childrenRect.width
+                        height: 30
+                        spacing: 10
+                        visible: mediaType == "image"
+
+                        Text {
+                            text: "Resolution:"
+                            color: "white"
+                            font.pixelSize: 15
+                            opacity: .6
+                        }
+
+                        Text {
+                            text: {
+                                if(mediaType != "image") return ""
+
+                                if(slideLoader.item) {
+                                    var image = slideLoader.item.imageComponent
+                                    if(image.status === Image.Ready) return image.sourceSize.width + " x " + image.sourceSize.height
+                                }
+                                return "? x ?"
+                            }
+                            color: "white"
+                            font.pixelSize: 15
+                        }
+                    }
+
+                    Row {
+                        id: videoResolutionRow
+                        width: childrenRect.width
+                        height: 30
+                        spacing: 5
+                        visible: mediaType == "video"
+
+                        Text {
+                            text: "Resolution:"
+                            color: "white"
+                            font.pixelSize: 15
+                            opacity: .6
+                        }
+
+                        Text {
+                            text: mediaType == "video" ? videoResolution : ""
+                            color: "white"
+                            font.pixelSize: 15
+                        }
+                    }
+
+                    Row {
+                        id: videoCodecRow
+                        width: childrenRect.width
+                        height: 30
+                        spacing: 5
+                        visible: mediaType == "video"
+
+                        Text {
+                            text: "Codec:"
+                            color: "white"
+                            font.pixelSize: 15
+                            opacity: .6
+                        }
+
+                        Text {
+                            text: mediaType == "video" ? videoCodec : ""
+                            color: "white"
+                            font.pixelSize: 15
+                        }
+                    }
+
+                    Row {
+                        id: videoFrameRateRow
+                        width: childrenRect.width
+                        height: 30
+                        spacing: 5
+                        visible: mediaType == "video"
+
+                        Text {
+                            text: "Frame rate:"
+                            color: "white"
+                            font.pixelSize: 15
+                            opacity: .6
+                        }
+
+                        Text {
+                            text: mediaType == "video" ? videoFrameRate : ""
+                            color: "white"
+                            font.pixelSize: 15
+                        }
+                    }
+
+                    Row {
+                        id: audioCodecRow
+                        width: childrenRect.width
+                        height: 30
+                        spacing: 5
+                        visible: mediaType == "audio"
+
+                        Text {
+                            text: "Codec:"
+                            color: "white"
+                            font.pixelSize: 15
+                            opacity: .6
+                        }
+
+                        Text {
+                            text: mediaType == "audio" ? audioCodec : ""
+                            color: "white"
+                            font.pixelSize: 15
+                        }
+                    }
+
+                    Row {
+                        id: audioSampleRateRow
+                        width: childrenRect.width
+                        height: 30
+                        spacing: 5
+                        visible: mediaType == "audio"
+
+                        Text {
+                            text: "Sample rate:"
+                            color: "white"
+                            font.pixelSize: 15
+                            opacity: .6
+                        }
+
+                        Text {
+                            text: mediaType == "audio" ? audioSampleRate : ""
+                            color: "white"
+                            font.pixelSize: 15
+                        }
+                    }
+
+                    Row {
+                        id: mediaSizeRow
+                        width: childrenRect.width
+                        height: 30
+                        spacing: 5
+
+                        Text {
+                            text: "Size:"
+                            color: "white"
+                            font.pixelSize: 15
+                            opacity: .6
+                        }
+
+                        Text {
+                            text: mediaSize + "MB"
+                            color: "white"
+                            font.pixelSize: 15
+                        }
+                    }
                 }
             }
         }
 
         onCurrentIndexChanged: {
             miniView.currentIndex = currentIndex
-        }
-
-        Component.onCompleted: {
-            if(selectedMedia.length > 0) {
-                currentIndex = selectedMedia[selectedMedia.length - 1]
-                miniView.currentIndex = currentIndex
-            }
-            else {
-                currentIndex = 0
-                miniView.currentIndex = 0
-            }
         }
     }
 }

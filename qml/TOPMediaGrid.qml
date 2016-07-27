@@ -1,6 +1,7 @@
-import QtQuick 2.2
+import QtQuick 2.5
 
 Flickable {
+    id: mainRect
     contentHeight: mediaGrid.height
 
     clip: true
@@ -8,12 +9,20 @@ Flickable {
     property variant gridModel
     property string searchFilter
     property string typeFilter
-    property bool readyToLoad: false
+    property bool readyToLoad: true
     property bool singleSelection: false
     property int currentSelection: -1
+    property bool mediaGallery: true
+    property bool clearSelectedMedia: false
 
     signal mediaSelected(int index)
     signal mediaUnselected(int index)
+    signal mediaRequested(int index)
+
+    function clearSelection() {
+        clearSelectedMedia = true
+        clearSelectedMedia = false
+    }
 
     Grid {
         id: mediaGrid
@@ -25,15 +34,32 @@ Flickable {
         property int cellSize: 140
 
         columns: {
-            Math.floor(width / 150)
+            return Math.floor(width / 150)
         }
 
-        add: Transition {
-            NumberAnimation { properties: "x,y"; duration: 200; easing.type: Easing.OutSine }
-        }
+//        add: Transition {
+//            NumberAnimation { properties: "x,y"; duration: 200; easing.type: Easing.OutSine }
+//        }
 
         move: Transition {
             NumberAnimation { properties: "x,y"; duration: 200; easing.type: Easing.OutSine }
+        }
+
+        onWidthChanged: {
+            updateCellSizeTimer.restart()
+        }
+
+        function updateCellSize() {
+            cellSize = 140 + (width % (columns * 140 + columnSpacing * (columns - 1))) / columns
+        }
+
+        Timer {
+            id: updateCellSizeTimer
+            interval: 200
+
+            onTriggered: {
+                mediaGrid.updateCellSize()
+            }
         }
 
         Repeater {
@@ -49,24 +75,31 @@ Flickable {
                             (typeFilter.length == 0 || mediaType == typeFilter))
                 }
 
+                property bool clearSelection: mainRect.clearSelectedMedia
                 property bool selected: {
                     if(singleSelection && currentSelection == index) return true
                     return false
                 }
 
-                Rectangle {
+                onClearSelectionChanged: {
+                    if(clearSelection && !singleSelection) {
+                        selected = false
+                    }
+                }
+
+                /*Rectangle {
                     id: mediaShadow
                     width: mediaLoader.width + 6
                     height: mediaLoader.height + 6
                     color: selected ? "transparent" : "#33000000"
                     radius: 10
-                    visible: mediaLoader.item ? mediaLoader.item.loaded : false
+                    //visible: mediaLoader.item ? mediaLoader.item.loaded : false
 
                     anchors {
                         top: parent.top
                         horizontalCenter: parent.horizontalCenter
                     }
-                }
+                }*/
 
                 Rectangle {
                     id: mediaSelectionRect
@@ -96,23 +129,28 @@ Flickable {
                     }
 
                     source: {
-                        if(!uploadCompleted || !readyToLoad) return "";
+                        if(mediaGallery) {
+                            if(!uploadCompleted || !readyToLoad) return "";
 
-                        if(mediaType == "image")
-                        {
+                            if(mediaType == "image")
+                            {
+                                return "TOPThumbnailImage.qml"
+                            }
+                            else if(mediaType == "video")
+                            {
+                                return "TOPThumbnailVideo.qml"
+                            }
+                            else if(mediaType == "audio")
+                            {
+                                return "TOPThumbnailAudio.qml"
+                            }
+                            else
+                            {
+                                return "TOPThumbnailUnknown.qml"
+                            }
+                        }
+                        else {
                             return "TOPThumbnailImage.qml"
-                        }
-                        else if(mediaType == "video")
-                        {
-                            return "TOPThumbnailVideo.qml"
-                        }
-                        else if(mediaType == "audio")
-                        {
-                            return "TOPThumbnailAudio.qml"
-                        }
-                        else
-                        {
-                            return "TOPThumbnailUnknown.qml"
                         }
                     }
 
@@ -129,7 +167,7 @@ Flickable {
                     id: thumbnailConnections
                     ignoreUnknownSignals: true
 
-                    onTouched: {
+                    onClicked: {
                         if(singleSelection) {
 //                            mediaRect.selected = true
                             currentSelection = index
@@ -140,21 +178,25 @@ Flickable {
                             else mediaUnselected(index)
                         }
                     }
+
+                    onDoubleClicked: {
+                        mediaRequested(index)
+                    }
                 }
 
                 Text {
                     id: textAlias
                     text: mediaAlias
-                    color: "white"
-                    clip: true
-                    width: parent.width
+                    color: "#888888"
                     elide: Text.ElideMiddle
-                    horizontalAlignment: Text.AlignHCenter
 
                     anchors {
                         top: mediaLoader.bottom
                         topMargin: 8
-                        horizontalCenter: parent.horizontalCenter
+                        left: parent.left
+                        leftMargin: 4
+                        right: parent.right
+                        rightMargin: 4
                     }
                 }
             }

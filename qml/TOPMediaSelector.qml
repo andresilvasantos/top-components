@@ -1,4 +1,4 @@
-import QtQuick 2.2
+import QtQuick 2.5
 import QtQuick.Window 2.0
 import TOP.Interactive 1.0
 import TOP.Utils 1.0

@@ -1,34 +1,33 @@
-import QtQuick 2.2
-//import QtMultimedia 5.0
+import QtQuick 2.5
 import QmlVlc 0.1
 
-Rectangle {
-    color: "#444444"
+Item {
+    id: mainRect
 
     property bool loaded: false
     property string mediaSource
     property string mediaAlias
-    signal touched()
+
+    signal clicked()
+    signal doubleClicked()
+
+    Rectangle {
+        anchors.fill: parent
+        border.width: 1
+        border.color: "#cccccc"
+        color: "#aaaaaa"
+    }
 
     VlcPlayer {
         id: mediaPlayer
-        mrl: mediaSource
         volume: 100
 
         onStateChanged: {
-            if(state == VlcPlayer.Error) console.log("Audio " + mediaAlias + " error.")
+            if(state == VlcPlayer.Ended || state == VlcPlayer.Error) {
+                stop()
+            }
         }
     }
-
-    /*Audio {
-        id: audio
-        autoLoad: false
-        source: mediaSource
-
-        onErrorStringChanged: {
-            console.log("Audio " + mediaAlias + " error: " + errorString)
-        }
-    }*/
 
     Image {
         id: icon
@@ -36,30 +35,50 @@ Rectangle {
         height: width
         fillMode: Image.PreserveAspectFit
         source: "qrc:/components/images/sound"
-
+        visible: !mouseArea.hovered
         anchors.centerIn: parent
     }
 
+    TOPLoadingBubbles {
+        anchors.fill: parent
+        visible: mouseArea.hovered && mediaPlayer.state != VlcPlayer.Ended && mediaPlayer.state != VlcPlayer.Playing && mediaPlayer.state != VlcPlayer.Stopped
+    }
+
     MouseArea {
+        id: mouseArea
         anchors.fill: parent
         hoverEnabled: true
 
-        onClicked: {
-            touched()
+        property bool hovered: false
+
+        onHoveredChanged: {
+            if(hovered) {
+                if(mediaPlayer.state !== VlcPlayer.Error) {
+                    mediaPlayer.mrl = mediaSource
+                    mediaPlayer.play()
+                }
+            }
+            else {
+                if(mediaPlayer.state !== VlcPlayer.Error) {
+                    mediaPlayer.stop()
+                }
+            }
         }
 
-        onExited: {
-            if(mediaPlayer.error === mediaPlayer.NoError) {
-                mediaPlayer.stop()
-                icon.visible = true
-            }
+        onClicked: {
+            mainRect.clicked()
+        }
+
+        onDoubleClicked: {
+            mainRect.doubleClicked()
         }
 
         onEntered: {
-            if(mediaPlayer.error === mediaPlayer.NoError) {
-                mediaPlayer.play()
-                icon.visible = false
-            }
+            hovered = true
+        }
+
+        onExited: {
+            hovered = false
         }
     }
 
